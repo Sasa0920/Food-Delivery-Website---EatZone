@@ -1,0 +1,34 @@
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors from "cors";
+import path from "path";  
+import { fileURLToPath } from "url"; 
+
+import authRoutes from "./routes/authRoutes.js";
+import mealRoutes from "./routes/meals.js";
+import cartRoutes from "./routes/cartRoutes.js";
+
+dotenv.config();
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.error(err));
+
+app.use("/api/auth", authRoutes);
+app.use("/meals", mealRoutes);
+app.use('/cart', cartRoutes);
+
+
+app.use("/assets", express.static(path.join(__dirname, "public/assets")));
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
